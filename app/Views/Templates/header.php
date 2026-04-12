@@ -1,7 +1,7 @@
 <?php $session = session(); //initialisation de la session ?>
 <html>
 <head>
-    <title>Projet Atlantik</title>
+    <title>Compagnie Atlantik</title>
     <!-- Latest compiled and minified CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -21,13 +21,14 @@
     <div class="collapse navbar-collapse" id="navMain">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
       <?php
-        if ($session->get('MEL') == 'Client') {
+        echo '<li class="nav-item"><a class="nav-link" href="' . site_url('afficherliaisons') . '">Afficher les liaisons</a></li>';
+        echo '<li class="nav-item"><a class="nav-link" href="' . site_url('afficherhorairestraversee') . '">Afficher les horaires de traversée</a></li>';
+        if ($session->get('MEL') != null) {
           echo '<li class="nav-item"><a class="nav-link" href="' . site_url('deconnecter') . '">Se déconnecter</a></li>';
         } else {
           echo '<li class="nav-item"><a class="nav-link" href="' . site_url('seconnecter') . '">Se connecter</a></li>';
           echo '<li class="nav-item"><a class="nav-link" href="' . site_url('creercompte') . '">Créer un compte</a></li>';
         }
-        echo '<li class="nav-item"><a class="nav-link" href="' . site_url('afficherliaisons') . '">Afficher les liaisons</a></li>';
       ?>
       </ul>
     </div>

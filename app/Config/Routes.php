@@ -14,3 +14,6 @@ $routes->get('creercompte', 'Visiteur::CreerCompte');
 $routes->post('creercompte', 'Visiteur::CreerCompte');
 $routes->get('afficherliaisons', 'Visiteur::AfficherLiaisons');
 $routes->get('affichertarifs/(:num)', 'Visiteur::AfficherTarifs/$1');
+$routes->match(['get', 'post'], 'afficherhorairestraversee', 'Visiteur::AfficherHorairesTraversee');
+$routes->get('afficherhorairestraversee/(:num)', 'Visiteur::AfficherHorairesTraversee/$1');
+$routes->get('reservertraversee/(:num)', 'Client::ReserverTraversee/$1', ["filter"=> "filtreclient"]);

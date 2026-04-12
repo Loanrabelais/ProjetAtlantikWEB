@@ -20,4 +20,15 @@ class ModeleLiaison extends Model
                     ->findAll();
         // exemple : Belle-Ile-en-Mer 15 8.3 Quiberon Le Palais
     }
+
+    public function getLiaison($NOLIAISON)
+    {
+        return $this->join('port', 'port.NOPORT = liaison.NOPORT_DEPART')
+                    ->join('port as port2', 'port2.NOPORT = liaison.NOPORT_ARRIVEE')
+                    ->join('secteur', 'secteur.NOSECTEUR = liaison.NOSECTEUR')
+                    ->select('secteur.NOM as Nomsecteur, liaison.NOLIAISON, liaison.DISTANCE, port.NOM as PORT_DEPART, port2.NOM as PORT_ARRIVEE')
+                    ->where('liaison.NOLIAISON', $NOLIAISON)
+                    ->first();
+        // exemple : Belle-Ile-en-Mer 15 8.3 Quiberon Le Palais
+    }
 }

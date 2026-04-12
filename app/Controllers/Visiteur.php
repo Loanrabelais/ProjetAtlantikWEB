@@ -1,5 +1,6 @@
 <?php
 namespace App\Controllers;
+
 use App\Models\ModeleClient;
 use App\Models\ModeleLiaison;
 use App\Models\ModelePort;
@@ -8,7 +9,7 @@ use App\Models\ModeleCategorie;
 use App\Models\ModeleTarif;
 use App\Models\ModeleType;
 use App\Models\ModelePeriode;
-use DeepCopy\f001\A;
+use App\Models\ModeleTraversee;
 
 class Visiteur extends BaseController
 {
@@ -63,6 +64,11 @@ class Visiteur extends BaseController
             /* MEL et mot de passe OK : MEL et profil sont stockés en session */
             $session->set('MEL', $utilisateurRetourne->MEL);
             $session->set('profil', 'Client');
+            $session->set('nom', $utilisateurRetourne->NOM);
+            $session->set('prenom', $utilisateurRetourne->PRENOM);
+            $session->set('adresse', $utilisateurRetourne->ADRESSE);
+            $session->set('codepostal', $utilisateurRetourne->CODEPOSTAL);
+            $session->set('ville', $utilisateurRetourne->VILLE);
             $data['MEL'] = $utilisateurRetourne->PRENOM.' '.$utilisateurRetourne->NOM;
             return view('Templates/Header', $data)
             . view('vue_ConnexionReussie')
@@ -171,5 +177,83 @@ class Visiteur extends BaseController
         return view('Templates/Header')
         . view('vue_AfficherTarifs', $data)
         . view('Templates/Footer');
+    }
+
+    public function AfficherHorairesTraversee($noSecteur = null)
+    {
+        $data['TitreDeLaPage'] = 'Afficher les horaires de traversée';
+        $secteurs = new ModeleSecteur();
+        $secteurs = $secteurs->findAll();
+        $data['secteurs'] = $secteurs;
+        if ($noSecteur != null) { // Si un secteur est sélectionné
+            $modSecteur = new ModeleSecteur();
+            $res = $modSecteur->where('NOSECTEUR', (int)$noSecteur)->get();
+            $secteur = $res->getResult();
+
+            $modliaisons = new ModeleLiaison();
+            $res = $modliaisons->where('NOSECTEUR', (int)$noSecteur)->get();
+            $liaisons = $res->getResult();
+
+            if (!empty($liaisons)) {
+                $modPort = new ModelePort();
+                foreach ($liaisons as $liaison) {
+                    $res = $modPort->where('NOPORT', $liaison->NOPORT_DEPART)->get();
+                    $liaison->PORT_DEPART = $res->getResult()[0];
+                    $res = $modPort->where('NOPORT', $liaison->NOPORT_ARRIVEE)->get();
+                    $liaison->PORT_ARRIVEE = $res->getResult()[0];
+                }
+
+                $modPeriode = new ModelePeriode();
+                foreach ($liaisons as $liaison) {
+                    $periodes = $modPeriode->findAll();
+                }
+
+                $data['liaisons'] = $liaisons;
+                $data['periodes'] = $periodes;
+            }
+            $data['secteurSelectionne'] = $secteur;
+
+            return view('Templates/Header')
+            . view('vue_AfficherHorairesTraversee', $data)
+            . view('Templates/Footer');
+        }
+        elseif ($this->request->is('post')) { // Si le formulaire est soumis
+            $noLiaison = $this->request->getPost('liaison_id');
+            $noPeriode = $this->request->getPost('periode_id');
+            $modLiaison = new ModeleLiaison();
+            $res = $modLiaison->where('NOLIAISON', (int)$noLiaison)->get();
+            $liaison = $res->getResult()[0];
+            $modPeriode = new ModelePeriode();
+            $res = $modPeriode->where('NOPERIODE', (int)$noPeriode)->get();
+            $periode = $res->getResult()[0];
+            $modelTraversee = new ModeleTraversee();
+            $traversees = $modelTraversee->getLesTraverseesBateaux($noLiaison, $periode);
+            $modelCategorie = new ModeleCategorie();
+            $categories = $modelCategorie->findAll();
+            foreach ($traversees as $traversee) {
+                $traversee->cats = [];
+                foreach ($categories as $categorie) {
+                    $cat = clone $categorie;
+                    $capaciteMax = $modelTraversee->getCapaciteMaximale($traversee->NOTRAVERSEE, $cat->LETTRECATEGORIE);
+                    $quantiteEnregistree = $modelTraversee->getQuantiteEnregistree($traversee->NOTRAVERSEE, $cat->LETTRECATEGORIE);
+                    $cat->PLACESDISPONIBLES = $capaciteMax - $quantiteEnregistree;
+                    $traversee->cats[] = $cat;
+                }
+            }
+            $data['categories'] = $categories;
+            $data['traversees'] = $traversees;
+
+            return view('Templates/Header')
+            . view('vue_AfficherHorairesTraversee', $data)
+            . view('Templates/Footer');
+        }
+        else {
+            $data['secteurSelectionne'] = null;
+            $data['liaisons'] = null;
+            $data['periodes'] = null;
+            return view('Templates/Header')
+            . view('vue_AfficherHorairesTraversee', $data)
+            . view('Templates/Footer');
+        }
     }
 }

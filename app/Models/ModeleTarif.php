@@ -18,25 +18,46 @@ class ModeleTarif extends Model
 
     public function getTarifs($NOLIAISON)
     {
-        $DATEDUJOUR = date('2019-09-01');
-        return $this->join('liaison', 'liaison.NOLIAISON = tarifer.NOLIAISON')
-                    ->join('port', 'port.NOPORT = liaison.NOPORT_DEPART')
-                    ->join('port as port2', 'port2.NOPORT = liaison.NOPORT_ARRIVEE')
-                    ->join('secteur', 'secteur.NOSECTEUR = liaison.NOSECTEUR')
-                    ->join('periode', 'periode.NOPERIODE = tarifer.NOPERIODE')
-                    ->join('categorie', 'categorie.LETTRECATEGORIE = tarifer.LETTRECATEGORIE')
-                    ->join('type', 'type.NOTYPE = tarifer.NOTYPE')
-                    ->select('categorie.LETTRECATEGORIE,
-                    categorie.LIBELLE AS categorieLIBELLE,
-                    type.LETTRECATEGORIE AS typeLETTRECATEGORIE,
-                    type.NOTYPE,
-                    type.NOTYPE, type.LIBELLE AS typeLIBELLE,
-                    periode.DATEDEBUT,
-                    periode.DATEFIN,
-                    tarifer.TARIF')
-                    ->where('tarifer.NOLIAISON', $NOLIAISON)
-                    ->where('periode.DATEFIN <=', $DATEDUJOUR)
-                    ->findAll();
-        // exemple : A Passager A1 - Adulte 01/09/2010 15/06/2011 18.00
+    $DATEDUJOUR = '2021-06-19';
+    return $this->join('liaison', 'liaison.NOLIAISON = tarifer.NOLIAISON')
+                ->join('port', 'port.NOPORT = liaison.NOPORT_DEPART')
+                ->join('port as port2', 'port2.NOPORT = liaison.NOPORT_ARRIVEE')
+                ->join('secteur', 'secteur.NOSECTEUR = liaison.NOSECTEUR')
+                ->join('periode', 'periode.NOPERIODE = tarifer.NOPERIODE')
+                ->join('categorie', 'categorie.LETTRECATEGORIE = tarifer.LETTRECATEGORIE')
+                ->join('type', 'type.NOTYPE = tarifer.NOTYPE')
+                ->select('categorie.LETTRECATEGORIE,
+                          categorie.LIBELLE AS categorieLIBELLE,
+                          type.LETTRECATEGORIE AS typeLETTRECATEGORIE,
+                          type.NOTYPE,
+                          type.LIBELLE,
+                          periode.DATEDEBUT,
+                          periode.DATEFIN,
+                          tarifer.TARIF')
+                ->where('tarifer.NOLIAISON', $NOLIAISON)
+                ->where('periode.DATEDEBUT <=', $DATEDUJOUR)
+                ->where('periode.DATEFIN >=', $DATEDUJOUR)
+                ->findAll();
+    }
+
+    public function getTarifsTest($NOLIAISON)
+    {
+    $DATEDUJOUR = '2021-06-19';
+    return $this->join('liaison', 'liaison.NOLIAISON = tarifer.NOLIAISON')
+                ->join('port', 'port.NOPORT = liaison.NOPORT_DEPART')
+                ->join('port as port2', 'port2.NOPORT = liaison.NOPORT_ARRIVEE')
+                ->join('secteur', 'secteur.NOSECTEUR = liaison.NOSECTEUR')
+                ->join('periode', 'periode.NOPERIODE = tarifer.NOPERIODE')
+                ->join('type', 'type.NOTYPE = tarifer.NOTYPE AND type.LETTRECATEGORIE = tarifer.LETTRECATEGORIE')
+                ->select('type.LETTRECATEGORIE AS typeLETTRECATEGORIE,
+                          type.NOTYPE,
+                          type.LIBELLE,
+                          periode.DATEDEBUT,
+                          periode.DATEFIN,
+                          tarifer.TARIF')
+                ->where('tarifer.NOLIAISON', $NOLIAISON)
+                ->where('periode.DATEDEBUT <=', $DATEDUJOUR)
+                ->where('periode.DATEFIN >=', $DATEDUJOUR)
+                ->findAll();
     }
 }

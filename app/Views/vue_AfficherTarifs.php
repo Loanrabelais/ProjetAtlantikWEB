@@ -24,7 +24,8 @@
             foreach ($types as $type):
                 if ($type->LETTRECATEGORIE != $categorie->LETTRECATEGORIE) continue;
                 if (!$first) echo '</tr><tr>';
-            ?>
+                ?>
+
                 <td><?= $type->LETTRECATEGORIE . $type->NOTYPE ?> - <?= $type->LIBELLE ?></td>
             <?php
                 $first = false;
@@ -34,10 +35,8 @@
         <?php endforeach; ?>
     </thead>
     <tbody>
-        <tr>
-            <?php foreach ($tarifs as $tarif): ?>
-                <td><?= $tarif->TARIF ?>€</td>
-            <?php endforeach; ?>
-        </tr>
+        <?php foreach ($tarifs as $tarif): ?>
+            <td><?= $tarif->TARIF ?>€</td>
+        <?php endforeach; ?>
     </tbody>
 </table>
