@@ -32,9 +32,9 @@ Saisir les informations relatives à la réservation
                 <td><?= htmlspecialchars($tarif->LIBELLE) ?></td>
                 <td><?= htmlspecialchars($tarif->TARIF) ?></td>
                 <td>
-                    <input type="hidden" name="enregisterments[<?= $i ?>][Reference]" value="<?= htmlspecialchars($tarif->LIBELLE) ?>" />
-                    <input type="hidden" name="enregisterments[<?= $i ?>][Prix]" value="<?= htmlspecialchars($tarif->TARIF) ?>" />
-                    <input type="text" name="enregisterments[<?= $i ?>][Quantite]" value="0" />
+                    <input type="hidden" name="enregistrements[<?= $i ?>][Reference]" value="<?= htmlspecialchars($tarif->LIBELLE) ?>" />
+                    <input type="hidden" name="enregistrements[<?= $i ?>][Prix]" value="<?= htmlspecialchars($tarif->TARIF) ?>" />
+                    <input type="text" name="enregistrements[<?= $i ?>][Quantite]" value="0" />
                 </td>
             </tr>
         <?php endforeach; ?>

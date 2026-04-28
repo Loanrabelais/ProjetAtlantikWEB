@@ -34,11 +34,11 @@ class Client extends BaseController
             . view('vue_ReserverTravresee.php', $data)
             . view('Templates/Footer');
         }
-        $enregisterments = array();
-        foreach ($_POST['enregisterments'] as $enregisterment){
-            $enregisterments[] = $enregisterment;
+        $enregistrements = array();
+        foreach ($_POST['enregistrements'] as $enregistrement){
+            $enregistrements[] = $enregistrement;
         }
-        die(var_dump($enregisterments));
+        die(var_dump($enregistrements));
         $reglesValidation = [
             'tarif' => 'permit_empty'
         ];
