@@ -62,6 +62,7 @@ class Visiteur extends BaseController
  
         if ($utilisateurRetourne != null) {
             /* MEL et mot de passe OK : MEL et profil sont stockés en session */
+            $session->set('NOCLIENT', $utilisateurRetourne->NOCLIENT);
             $session->set('MEL', $utilisateurRetourne->MEL);
             $session->set('profil', 'Client');
             $session->set('nom', $utilisateurRetourne->NOM);

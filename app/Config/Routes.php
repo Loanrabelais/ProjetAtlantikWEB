@@ -16,5 +16,4 @@ $routes->get('afficherliaisons', 'Visiteur::AfficherLiaisons');
 $routes->get('affichertarifs/(:num)', 'Visiteur::AfficherTarifs/$1');
 $routes->match(['get', 'post'], 'afficherhorairestraversee', 'Visiteur::AfficherHorairesTraversee');
 $routes->get('afficherhorairestraversee/(:num)', 'Visiteur::AfficherHorairesTraversee/$1');
-$routes->match(['get', 'post'], 'reservertraversee', 'Client::ReserverTraversee', ["filter"=> "filtreclient"]);
-$routes->get('reservertraversee/(:num)', 'Client::ReserverTraversee/$1', ["filter"=> "filtreclient"]);
+$routes->match(['get', 'post'], 'reservertraversee/(:num)', 'Client::ReserverTraversee/$1', ["filter"=> "filtreclient"]);

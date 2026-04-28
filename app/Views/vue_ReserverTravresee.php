@@ -2,9 +2,9 @@
 <h2> <?php htmlspecialchars($TitreDeLaPage) ?></h2>
 
 <?php
-if ($TitreDeLaPage == 'Saisie traversee incorrecte')
-  echo service('validation')->listErrors();
-echo form_open('reservertraversee')
+if ($TitreDeLaPage == 'Saisie incorrecte')
+    echo service('validation')->listErrors();
+echo form_open('reservertraversee/'.$traversee->NOTRAVERSEE);
 ?>
 <h6> Liaison <?php echo $nomLiaison->PORT_DEPART; $nomLiaison->PORT_ARRIVEE; ?></h6>
 <h6> Traversee N° <?php echo $traversee->NOTRAVERSEE; ?> </t>
@@ -25,14 +25,16 @@ Saisir les informations relatives à la réservation
             </tr>
     </thead>
     <tbody>
-        <?php foreach ($tarifs as $tarif): ?>
+        <?php $i = 0;
+        foreach ($tarifs as $tarif):
+            $i++; ?>
             <tr>
                 <td><?= htmlspecialchars($tarif->LIBELLE) ?></td>
                 <td><?= htmlspecialchars($tarif->TARIF) ?></td>
                 <td>
-                    <input type="text"
-                        name="<?php 'Quantite_' . htmlspecialchars($tarif->LIBELLE, ENT_QUOTES, 'UTF-8') ?>"
-                        value="0">
+                    <input type="hidden" name="enregisterments[<?= $i ?>][Reference]" value="<?= htmlspecialchars($tarif->LIBELLE) ?>" />
+                    <input type="hidden" name="enregisterments[<?= $i ?>][Prix]" value="<?= htmlspecialchars($tarif->TARIF) ?>" />
+                    <input type="text" name="enregisterments[<?= $i ?>][Quantite]" value="0" />
                 </td>
             </tr>
         <?php endforeach; ?>
