@@ -11,6 +11,7 @@ use App\Models\ModeleType;
 use App\Models\ModelePeriode;
 use App\Models\ModeleTraversee;
 use App\Models\ModeleReservation;
+use App\Models\ModeleEnregistrer;
 
 class Client extends BaseController
 {
@@ -35,12 +36,13 @@ class Client extends BaseController
             . view('Templates/Footer');
         }
         $enregistrements = array();
+        $montantTotal = 0;
         foreach ($_POST['enregistrements'] as $enregistrement){
             $enregistrements[] = $enregistrement;
+            $montantTotal += $enregistrement['Quantite']*$enregistrement['Prix'];
         }
-        die(var_dump($enregistrements));
         $reglesValidation = [
-            'tarif' => 'permit_empty'
+            'enregistrement' => 'permit_empty'
         ];
         if (!$this->validate($reglesValidation)) {
             /* formulaire non validé, on renvoie le formulaire */
@@ -49,15 +51,29 @@ class Client extends BaseController
             . view('vue_ReserverTravresee', $data)
             . view('Templates/Footer');
         }
-        $donneesAInserer = array(
+        $reservationAInserer = array(
             'NOTRAVERSEE' => $traversee->NOTRAVERSEE,
             'NOCLIENT' => $_SESSION['NOCLIENT'],
             'DATEHEURE' => $traversee->DATEHEUREDEPART,
-            'MONTANTTOTAL' => 0
+            'MONTANTTOTAL' => $montantTotal,
+            'PAYE' => 0
         );
-        die(var_dump($donneesAInserer));
-        $modelRerservation = new ModelRerservation();
-        $donnees['produitAjoute'] = $modelProduit->insert($donneesAInserer, false);
+        $modelRerservation = new ModeleReservation();
+        $reservationAjoute = $modelRerservation->insert($reservationAInserer, false);
+        $data['reservationAjoute'] = $reservationAjoute;
+        foreach ($enregistrements as $enregistrement){
+            if ($enregistrement['Quantite'] != 0){
+                $enregistrementAInserer = array(
+                    'NORESERVATION' => 9001,
+                    'LETTRECATEGORIE' => $enregistrement['Lettrecategorie'],
+                    'NOTYPE' => $enregistrement['Notype'],
+                    'QUANTITERESERVEE' => $enregistrement['Quantite'],
+                    'QUANTITEEMBARQUEE' => 0
+                );
+                $modelEnregistrer = new ModeleEnregistrer();
+                $modelEnregistrer->insert($enregistrementAInserer,false);
+            }
+        }
 
         return view('Templates/Header')
             .view('vue_RapportAjouterReservation', $data)

@@ -33,6 +33,8 @@ Saisir les informations relatives à la réservation
                 <td><?= htmlspecialchars($tarif->TARIF) ?></td>
                 <td>
                     <input type="hidden" name="enregistrements[<?= $i ?>][Reference]" value="<?= htmlspecialchars($tarif->LIBELLE) ?>" />
+                    <input type="hidden" name="enregistrements[<?= $i ?>][Lettrecategorie]" value="<?= htmlspecialchars($tarif->typeLETTRECATEGORIE) ?>" />
+                    <input type="hidden" name="enregistrements[<?= $i ?>][Notype]" value="<?= htmlspecialchars($tarif->NOTYPE) ?>" />
                     <input type="hidden" name="enregistrements[<?= $i ?>][Prix]" value="<?= htmlspecialchars($tarif->TARIF) ?>" />
                     <input type="text" name="enregistrements[<?= $i ?>][Quantite]" value="0" />
                 </td>
