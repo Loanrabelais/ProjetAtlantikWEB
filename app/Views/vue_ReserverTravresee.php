@@ -4,6 +4,8 @@
 <?php
 if ($TitreDeLaPage == 'Saisie incorrecte')
     echo service('validation')->listErrors();
+elseif($TitreDeLaPage == 'Capacité dépassée')
+    echo '<h3> la capacité d une des catégorie a été dépassée <h3>';
 echo form_open('reservertraversee/'.$traversee->NOTRAVERSEE);
 ?>
 <h6> Liaison <?php echo $nomLiaison->PORT_DEPART; $nomLiaison->PORT_ARRIVEE; ?></h6>

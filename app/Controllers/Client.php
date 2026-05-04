@@ -1,4 +1,4 @@
-<?php
+<?php //L'UC marche et la gestion des erreures est opérationel par contre le feedback du user est à revoire
 namespace App\Controllers;
 
 use App\Models\ModeleClient;
@@ -35,22 +35,54 @@ class Client extends BaseController
             . view('vue_ReserverTravresee.php', $data)
             . view('Templates/Footer');
         }
-        $enregistrements = array();
+        
+        // Si formulaire
+        $enregistrements = $_POST['enregistrements'];
         $montantTotal = 0;
-        foreach ($_POST['enregistrements'] as $enregistrement){
-            $enregistrements[] = $enregistrement;
-            $montantTotal += $enregistrement['Quantite']*$enregistrement['Prix'];
-        }
+        $overbooked = [];
+
         $reglesValidation = [
-            'enregistrement' => 'permit_empty'
+            'enregistrements.*.Quantite' => 'required|integer',
         ];
+
+        // valide les inputs
         if (!$this->validate($reglesValidation)) {
-            /* formulaire non validé, on renvoie le formulaire */
             $data['TitreDeLaPage'] = "Saisie incorrecte";
+            $data['errors'] = $this->validator->getErrors();
             return view('Templates/Header')
-            . view('vue_ReserverTravresee', $data)
-            . view('Templates/Footer');
+                . view('vue_ReserverTravresee', $data)
+                . view('Templates/Footer');
         }
+
+        // calcule le total et detecte les sur-capacités
+        foreach ($enregistrements as $idx => $enregistrement) {
+            $quantite = $enregistrement['Quantite'];
+            $prix = $enregistrement['Prix'];
+            $montantTotal += $quantite * $prix;
+
+            $capMax = $modelTraversee->getCapaciteMaximale($traversee->NOTRAVERSEE, $enregistrement['Lettrecategorie']);
+            $capEnreg = $modelTraversee->getQuantiteEnregistree($traversee->NOTRAVERSEE, $enregistrement['Lettrecategorie']);
+
+            if ($quantite > ($capMax - $capEnreg)) {
+                $overbooker[] = [
+                    'index' => $idx,
+                    'Lettrecategorie' => $enregistrement['Lettrecategorie'],
+                    'demandee' => $quantite,
+                    'disponible' => max(0, $capMax - $capEnreg)
+                ];
+            }
+        }
+
+        // si overbooker, retourne la vue
+        if (!empty($overbooker)) {
+            $data['TitreDeLaPage'] = "Capacité dépassée";
+            $data['overbooked'] = $overbooked;
+            return view('Templates/Header')
+                . view('vue_ReserverTravresee', $data)
+                . view('Templates/Footer');
+        }
+
+        //Insertion de la reservation
         $reservationAInserer = array(
             'NOTRAVERSEE' => $traversee->NOTRAVERSEE,
             'NOCLIENT' => $_SESSION['NOCLIENT'],
@@ -58,13 +90,15 @@ class Client extends BaseController
             'MONTANTTOTAL' => $montantTotal,
             'PAYE' => 0
         );
+
+        //insertion des enregistrements (table enregistrer)
         $modelRerservation = new ModeleReservation();
-        $reservationAjoute = $modelRerservation->insert($reservationAInserer, false);
-        $data['reservationAjoute'] = $reservationAjoute;
+        $noReservationAjoute = $modelRerservation->insert($reservationAInserer);
+        $data['noReservationAjoute'] = $noReservationAjoute;
         foreach ($enregistrements as $enregistrement){
             if ($enregistrement['Quantite'] != 0){
                 $enregistrementAInserer = array(
-                    'NORESERVATION' => 9001,
+                    'NORESERVATION' => $noReservationAjoute,
                     'LETTRECATEGORIE' => $enregistrement['Lettrecategorie'],
                     'NOTYPE' => $enregistrement['Notype'],
                     'QUANTITERESERVEE' => $enregistrement['Quantite'],
@@ -74,7 +108,7 @@ class Client extends BaseController
                 $modelEnregistrer->insert($enregistrementAInserer,false);
             }
         }
-
+        $data['TitreDeLaPage'] = 'Reservation ajoutée';
         return view('Templates/Header')
             .view('vue_RapportAjouterReservation', $data)
             .view('Templates/Footer');
