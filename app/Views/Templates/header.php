@@ -24,7 +24,9 @@
         echo '<li class="nav-item"><a class="nav-link" href="' . site_url('afficherliaisons') . '">Afficher les liaisons</a></li>';
         echo '<li class="nav-item"><a class="nav-link" href="' . site_url('afficherhorairestraversee') . '">Afficher les horaires de traversée</a></li>';
         if ($session->get('MEL') != null) {
+          echo '<li class="nav-item"><a class="nav-link" href="' . site_url('afficherhistoriquereservations') . '">Afficher mon historique de réservations</a></li>';
           echo '<li class="nav-item"><a class="nav-link" href="' . site_url('deconnecter') . '">Se déconnecter</a></li>';
+          echo '<li class="nav-item"><a class="nav-link" href="' . site_url('modifiercompte') . '">Modifier mon compte</a></li>';
         } else {
           echo '<li class="nav-item"><a class="nav-link" href="' . site_url('seconnecter') . '">Se connecter</a></li>';
           echo '<li class="nav-item"><a class="nav-link" href="' . site_url('creercompte') . '">Créer un compte</a></li>';

@@ -51,9 +51,9 @@ class Visiteur extends BaseController
         $MdP = $this->request->getPost('txtMotDePasse');
  
         /* on va chercher dans la BDD l'utilisateur correspondant aux id et mot de passe saisis */
-        $modUtilisateur = new ModeleClient(); // instanciation modèle
+        $modelClient = new ModeleClient(); // instanciation modèle
         $condition = ['MEL'=>$NOM,'motdepasse'=>$MdP];
-        $utilisateurRetourne = $modUtilisateur->where($condition)->first();
+        $utilisateurRetourne = $modelClient->where($condition)->first();
         /* where : méthode, QueryBuilder, héritée de Model (), retourne,
         ici sous forme d'un objet, le résultat de la requête :
         SELECT * FROM utilisateur  WHERE identifiant='$pId' and motdepasse='$MotdePasse
@@ -70,6 +70,8 @@ class Visiteur extends BaseController
             $session->set('adresse', $utilisateurRetourne->ADRESSE);
             $session->set('codepostal', $utilisateurRetourne->CODEPOSTAL);
             $session->set('ville', $utilisateurRetourne->VILLE);
+            $session->set('telephonefixe', $utilisateurRetourne->TELEPHONEFIXE);
+            $session->set('telephonemobile', $utilisateurRetourne->TELEPHONEMOBILE);
             $data['MEL'] = $utilisateurRetourne->PRENOM.' '.$utilisateurRetourne->NOM;
             return view('Templates/Header', $data)
             . view('vue_ConnexionReussie')
@@ -136,12 +138,24 @@ class Visiteur extends BaseController
 
         $modelClient = new ModeleClient(); //instanciation du modèle
         
-        $donnees['clientAjoute'] = $modelClient->insert($donneesAInserer, false);        
+        $modelClient->insert($donneesAInserer);
+        $utilisateurRetourne = $modelClient->first();
+        // Initialisation de la session
+        $session->set('NOCLIENT', $utilisateurRetourne->NOCLIENT);
+        $session->set('MEL', $utilisateurRetourne->MEL);
+        $session->set('profil', 'Client');
+        $session->set('nom', $utilisateurRetourne->NOM);
+        $session->set('prenom', $utilisateurRetourne->PRENOM);
+        $session->set('adresse', $utilisateurRetourne->ADRESSE);
+        $session->set('codepostal', $utilisateurRetourne->CODEPOSTAL);
+        $session->set('ville', $utilisateurRetourne->VILLE);
+        $session->set('telephonefixe', $utilisateurRetourne->TELEPHONEFIXE);
+        $session->set('telephonemobile', $utilisateurRetourne->TELEPHONEMOBILE);
         $session->set('MEL', $donneesAInserer['MEL']);
         $session->set('profil', 'Client');
         $data['MEL'] = $donneesAInserer['PRENOM'].' '.$donneesAInserer['NOM'];
         return view('Templates/Header')
-            .view('vue_CreerCompteReussi', $donnees)
+            .view('vue_CreerCompteReussi')
             .view('Templates/Footer');
     }
 

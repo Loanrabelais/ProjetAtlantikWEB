@@ -1,13 +1,7 @@
 <?php $session = session(); //initialisation de la session ?>
 <h2> <?php htmlspecialchars($TitreDeLaPage) ?></h2>
 
-<?php
-if ($TitreDeLaPage == 'Saisie incorrecte')
-    echo service('validation')->listErrors();
-elseif($TitreDeLaPage == 'Capacité dépassée')
-    echo '<h3> la capacité d une des catégorie a été dépassée <h3>';
-echo form_open('reservertraversee/'.$traversee->NOTRAVERSEE);
-?>
+<?php echo form_open('reservertraversee/'.$traversee->NOTRAVERSEE); ?>
 <h6> Liaison <?php echo $nomLiaison->PORT_DEPART; $nomLiaison->PORT_ARRIVEE; ?></h6>
 <h6> Traversee N° <?php echo $traversee->NOTRAVERSEE; ?> </t>
 le <?php echo $traversee->DATEHEUREDEPART; ?></h6><br>
