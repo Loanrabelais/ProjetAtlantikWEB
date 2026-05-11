@@ -185,9 +185,6 @@ class Visiteur extends BaseController
         $modelType = new ModeleType();
         $types = $modelType->findAll();
         $data['types'] = $types;
-        $modelTarif = new ModeleTarif();
-        $tarif = $modelTarif->findAll();
-        $data['tarif'] = $tarif;
 
         return view('Templates/Header')
         . view('vue_AfficherTarifs', $data)

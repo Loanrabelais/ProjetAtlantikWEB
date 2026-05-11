@@ -182,9 +182,9 @@ class Client extends BaseController
     public function AfficherHistoriqueReservations()
     {
         $data['TitreDeLaPage'] = 'Historique des réservations';
-        $pager = \Config\Services::pager();
         $modelReservation = new ModeleReservation();
         $reservations = $modelReservation->where('NOCLIENT', session('NOCLIENT'))->paginate(4);
+        $pager = \Config\Services::pager();
         $modelLiaison = new ModeleLiaison();
         $modelTraversee = new ModeleTraversee();
         foreach ($reservations as $reservation) {

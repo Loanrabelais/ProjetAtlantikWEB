@@ -31,4 +31,7 @@
             </tbody>
         </table>
     </div>
+    <div class="d-flex justify-content-center mt-3">
+        <?= $pager->links('default', 'my_bootstrap5') ?>
+    </div>
 <?php endif; ?>

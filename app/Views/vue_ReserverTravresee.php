@@ -36,8 +36,11 @@ Saisir les informations relatives à la réservation
                 </td>
             </tr>
         <?php endforeach; ?>
-        <br>
-        <input type="submit" name="submit" value="Valider" />
+        <tr>
+            <td colspan="3">
+                <input type="submit" name="submit" value="Valider" />
+            </td>
+        </tr>
         <?php echo form_close(); ?>
     </tbody>
 </table>
