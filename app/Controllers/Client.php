@@ -118,8 +118,6 @@ class Client extends BaseController
     
     public function ModifierCompte()
     {
-        $session = session();
-
         $data['TitreDeLaPage'] = 'Modifier un compte';
 
         if (!$this->request->is('post')) {
@@ -148,6 +146,9 @@ class Client extends BaseController
             . view('vue_ModifierCompte', $data)
             . view('Templates/Footer');
         }
+        
+        session()->destroy();
+        $session = session();
 
         $donneesAUpdate = array(
             'NOM' => $this->request->getPost('txtNOM'),

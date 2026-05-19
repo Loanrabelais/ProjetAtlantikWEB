@@ -11,14 +11,9 @@ class ModeleTarif extends Model
  
     protected $allowedFields = ['NOPERIODE', 'LETTRECATEGORIE', 'NOTYPE', 'NOLIAISON', 'PRIX'];
 
-    public function getTarifsPourUnTypeEtUnePeriode($NOLIAISON, $NOPERIODE, $LETTRECATEGORIE, $NOTYPE)
-    {
-        return $this->where(['NOLIAISON'=>$NOLIAISON, 'NOPERIODE'=>$NOPERIODE, 'LETTRECATEGORIE'=>$LETTRECATEGORIE, 'NOTYPE'=>$NOTYPE])->first();
-    }// non
-
     public function getTarifs($NOLIAISON)
     {
-    $DATEDUJOUR = '2021-06-19';
+    $DATEDUJOUR = date('Y-m-d');
     return $this->join('liaison', 'liaison.NOLIAISON = tarifer.NOLIAISON')
                 ->join('port', 'port.NOPORT = liaison.NOPORT_DEPART')
                 ->join('port as port2', 'port2.NOPORT = liaison.NOPORT_ARRIVEE')
@@ -32,7 +27,6 @@ class ModeleTarif extends Model
                           periode.DATEFIN,
                           tarifer.TARIF')
                 ->where('tarifer.NOLIAISON', $NOLIAISON)
-                ->where('periode.DATEDEBUT <=', $DATEDUJOUR)
                 ->where('periode.DATEFIN >=', $DATEDUJOUR)
                 ->findAll();
     }

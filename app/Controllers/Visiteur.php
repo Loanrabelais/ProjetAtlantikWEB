@@ -20,7 +20,7 @@ class Visiteur extends BaseController
         . view('Templates/footer');
     }
 
-        public function SeConnecter()
+    public function SeConnecter()
     {
         $session = session();
 
@@ -28,9 +28,9 @@ class Visiteur extends BaseController
 
         /* TEST SI FORMULAIRE POSTE OU SI APPEL DIRECT (EN GET) */
         if (!$this->request->is('post')) {
-            return view('Templates/Header', $data) // Renvoi formulaire de connexion
+            return view('Templates/header', $data) // Renvoi formulaire de connexion
             . view('vue_SeConnecter')
-            . view('Templates/Footer');
+            . view('Templates/footer');
         }
         /* SI FORMULAIRE NON POSTE, LE CODE QUI SUIT N'EST PAS EXECUTE */
  
@@ -42,9 +42,9 @@ class Visiteur extends BaseController
 
         if (!$this->validate($reglesValidation)) {
             $data['TitreDeLaPage'] = "Saisie incorrecte";
-            return view('Templates/Header', $data)
+            return view('Templates/header', $data)
             . view('vue_SeConnecter') // Renvoi formulaire de connexion
-            . view('Templates/Footer');
+            . view('Templates/footer');
         }
         
         $NOM = $this->request->getPost('txtMEL');
@@ -73,15 +73,15 @@ class Visiteur extends BaseController
             $session->set('telephonefixe', $utilisateurRetourne->TELEPHONEFIXE);
             $session->set('telephonemobile', $utilisateurRetourne->TELEPHONEMOBILE);
             $data['MEL'] = $utilisateurRetourne->PRENOM.' '.$utilisateurRetourne->NOM;
-            return view('Templates/Header', $data)
+            return view('Templates/header', $data)
             . view('vue_ConnexionReussie')
-            . view('Templates/Footer');
+            . view('Templates/footer');
         } else {
             /* MEL et/ou mot de passe OK : on renvoie le formulaire  */
             $data['TitreDeLaPage'] = "MEL ou/et Mot de passe inconnu(s)";
-            return view('Templates/Header', $data)
+            return view('Templates/header', $data)
             . view('vue_SeConnecter')
-            . view('Templates/Footer');
+            . view('Templates/footer');
         }
     } // Fin seConnecter
 
@@ -93,14 +93,12 @@ class Visiteur extends BaseController
 
     public function CreerCompte()
     {
-        $session = session();
-
         $data['TitreDeLaPage'] = 'Créer un compte';
 
         if (!$this->request->is('post')) {
-            return view('Templates/Header', $data)
+            return view('Templates/header', $data)
             . view('vue_CreerCompte')
-            . view('Templates/Footer');
+            . view('Templates/footer');
         }
 
         /* VALIDATION DU FORMULAIRE */
@@ -113,16 +111,18 @@ class Visiteur extends BaseController
             'txtTELEPHONEFIXE' => 'permit_empty|string|max_length[16]',
             'txtTELEPHONEMOBILE' => 'permit_empty|string|max_length[16]',
 
-            'txtMEL' => 'required|string|max_length[80]',
+            'txtMEL' => 'required|mail|is_unique[client.MEL]|max_length[80]',
             'txtMOTDEPASSE' => 'required|string|max_length[80]'
         ];
 
         if (!$this->validate($reglesValidation)) {
             $data['TitreDeLaPage'] = "Saisie incorrecte";
-            return view('Templates/Header', $data)
+            return view('Templates/header', $data)
             . view('vue_CreerCompte')
-            . view('Templates/Footer');
+            . view('Templates/footer');
         }
+
+        session()->destroy();
 
         $donneesAInserer = array(
             'NOM' => $this->request->getPost('txtNOM'),
@@ -140,23 +140,10 @@ class Visiteur extends BaseController
         
         $modelClient->insert($donneesAInserer);
         $utilisateurRetourne = $modelClient->first();
-        // Initialisation de la session
-        $session->set('NOCLIENT', $utilisateurRetourne->NOCLIENT);
-        $session->set('MEL', $utilisateurRetourne->MEL);
-        $session->set('profil', 'Client');
-        $session->set('nom', $utilisateurRetourne->NOM);
-        $session->set('prenom', $utilisateurRetourne->PRENOM);
-        $session->set('adresse', $utilisateurRetourne->ADRESSE);
-        $session->set('codepostal', $utilisateurRetourne->CODEPOSTAL);
-        $session->set('ville', $utilisateurRetourne->VILLE);
-        $session->set('telephonefixe', $utilisateurRetourne->TELEPHONEFIXE);
-        $session->set('telephonemobile', $utilisateurRetourne->TELEPHONEMOBILE);
-        $session->set('MEL', $donneesAInserer['MEL']);
-        $session->set('profil', 'Client');
         $data['MEL'] = $donneesAInserer['PRENOM'].' '.$donneesAInserer['NOM'];
-        return view('Templates/Header')
+        return view('Templates/header')
             .view('vue_CreerCompteReussi')
-            .view('Templates/Footer');
+            .view('Templates/footer');
     }
 
     public function AfficherLiaisons()
@@ -165,9 +152,9 @@ class Visiteur extends BaseController
         $modelLiaison = new ModeleLiaison();
         $liaisons = $modelLiaison->getLiaisons();
         $data['liaisons'] = $liaisons;
-        return view('Templates/Header')
+        return view('Templates/header')
         . view('vue_AfficherLiaisons', $data)
-        . view('Templates/Footer');
+        . view('Templates/footer');
     }
 
     public function AfficherTarifs($NOLIAISON)
@@ -177,7 +164,7 @@ class Visiteur extends BaseController
         $tarifs = $modelTarif->getTarifs($NOLIAISON);
         $data['tarifs'] = $tarifs;
         $modelPeriode = new ModelePeriode();
-        $periodes = $modelPeriode->findAll();
+        $periodes = $modelPeriode->where('periode.DATEFIN >=', date('Y-m-d'))->findAll();
         $data['periodes'] = $periodes;
         $modelCategorie = new ModeleCategorie();
         $categories = $modelCategorie->findAll();
@@ -186,9 +173,9 @@ class Visiteur extends BaseController
         $types = $modelType->findAll();
         $data['types'] = $types;
 
-        return view('Templates/Header')
+        return view('Templates/header')
         . view('vue_AfficherTarifs', $data)
-        . view('Templates/Footer');
+        . view('Templates/footer');
     }
 
     public function AfficherHorairesTraversee($noSecteur = null)
@@ -198,15 +185,12 @@ class Visiteur extends BaseController
         $secteurs = $secteurs->findAll();
         $data['secteurs'] = $secteurs;
         if ($noSecteur != null) { // Si un secteur est sélectionné
-            $modSecteur = new ModeleSecteur();
-            $res = $modSecteur->where('NOSECTEUR', (int)$noSecteur)->get();
-            $secteur = $res->getResult();
 
             $modliaisons = new ModeleLiaison();
             $res = $modliaisons->where('NOSECTEUR', (int)$noSecteur)->get();
             $liaisons = $res->getResult();
 
-            if (!empty($liaisons)) {
+            if (!empty($liaisons)) { // Si des liaisons existent pour ce secteur
                 $modPort = new ModelePort();
                 foreach ($liaisons as $liaison) {
                     $res = $modPort->where('NOPORT', $liaison->NOPORT_DEPART)->get();
@@ -223,23 +207,20 @@ class Visiteur extends BaseController
                 $data['liaisons'] = $liaisons;
                 $data['periodes'] = $periodes;
             }
-            $data['secteurSelectionne'] = $secteur;
+            $data['secteurSelectionne'] = $noSecteur;
 
-            return view('Templates/Header')
+            return view('Templates/header')
             . view('vue_AfficherHorairesTraversee', $data)
-            . view('Templates/Footer');
+            . view('Templates/footer');
         }
         elseif ($this->request->is('post')) { // Si le formulaire est soumis
             $noLiaison = $this->request->getPost('liaison_id');
-            $noPeriode = $this->request->getPost('periode_id');
+            $date = $this->request->getPost('date');
             $modLiaison = new ModeleLiaison();
             $res = $modLiaison->where('NOLIAISON', (int)$noLiaison)->get();
             $liaison = $res->getResult()[0];
-            $modPeriode = new ModelePeriode();
-            $res = $modPeriode->where('NOPERIODE', (int)$noPeriode)->get();
-            $periode = $res->getResult()[0];
             $modelTraversee = new ModeleTraversee();
-            $traversees = $modelTraversee->getLesTraverseesBateaux($noLiaison, $periode);
+            $traversees = $modelTraversee->getLesTraverseesBateaux($noLiaison, $date);
             $modelCategorie = new ModeleCategorie();
             $categories = $modelCategorie->findAll();
             foreach ($traversees as $traversee) {
@@ -255,7 +236,7 @@ class Visiteur extends BaseController
             $data['categories'] = $categories;
             $data['traversees'] = $traversees;
 
-            return view('Templates/Header')
+            return view('Templates/header')
             . view('vue_AfficherHorairesTraversee', $data)
             . view('Templates/Footer');
         }
@@ -263,7 +244,7 @@ class Visiteur extends BaseController
             $data['secteurSelectionne'] = null;
             $data['liaisons'] = null;
             $data['periodes'] = null;
-            return view('Templates/Header')
+            return view('Templates/header')
             . view('vue_AfficherHorairesTraversee', $data)
             . view('Templates/Footer');
         }

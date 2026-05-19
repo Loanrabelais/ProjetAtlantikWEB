@@ -24,12 +24,8 @@
                     <?php endforeach; ?>
                     </select>
 
-                    <select name="periode_id" class="form-select" required>
-                    <option value="">Choisir une période</option>
-                    <?php foreach ($periodes as $periode): ?>
-                        <option value="<?= (int)$periode->NOPERIODE ?>"><?= htmlspecialchars($periode->DATEDEBUT).' à '.htmlspecialchars($periode->DATEFIN) ?></option>
-                    <?php endforeach; ?>
-                    </select>
+                    <option value="">Choisir une date</option>
+                    <input type="date" id="date" name="date" required>
 
                     <button class="btn btn-primary" type="submit">Afficher</button>
                 </div>
@@ -57,7 +53,7 @@
                     <?php foreach ($traversees as $traversee) : ?>
                         <tr>
                             <td><?= anchor('reservertraversee/' . (int)$traversee->NOTRAVERSEE, (int)$traversee->NOTRAVERSEE) ?></td>
-                            <td><?= htmlspecialchars($traversee->DATEHEUREDEPART, ENT_QUOTES) ?></td>
+                            <td><?= htmlspecialchars((new DateTime($traversee->DATEHEUREDEPART))->format('H:i'), ENT_QUOTES) ?></td>
                             <td><?= htmlspecialchars($traversee->NOMBATEAU, ENT_QUOTES) ?></td>
                             <?php foreach ($traversee->cats as $categorie) : ?>
                                 <td><?= (int)$categorie->PLACESDISPONIBLES ?></td>
@@ -67,9 +63,8 @@
                 </tbody>
             </table>
         <?php else: ?>
-            <p>Aucune traversée disponible pour la liaison et la période sélectionnées.</p>
+            <p>Aucune traversée disponible pour la liaison et la date sélectionnées.</p>
         <?php endif; ?>
     <?php endif; ?>
-
     </main>
 </div>

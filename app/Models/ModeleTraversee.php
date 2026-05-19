@@ -11,16 +11,16 @@ class ModeleTraversee extends Model
  
     protected $allowedFields = ['NOLIAISON', 'NOBATEAU', 'DATEHEUREDEPART', 'DATEHEUREARRIVEE', 'CLOTUREEMBARQUEMENT'];
 
-    public function getLesTraverseesBateaux($noLiaison, $periode = null)
+    public function getLesTraverseesBateaux($noLiaison, $date = null)
     {
-        if ($periode != null)
+        if ($date != null)
         {
-        return $this->join('bateau', 'bateau.NOBATEAU = traversee.NOBATEAU')
-            ->select('traversee.NOTRAVERSEE, traversee.DATEHEUREDEPART, bateau.NOM AS NOMBATEAU')
-            ->where('NOLIAISON', (int)$noLiaison)
-            ->where('DATEHEUREDEPART >=', $periode->DATEDEBUT)
-            ->where('DATEHEUREDEPART <=', $periode->DATEFIN)
-            ->get()->getResult();
+            return $this->join('bateau', 'bateau.NOBATEAU = traversee.NOBATEAU')
+                ->select('traversee.NOTRAVERSEE, traversee.DATEHEUREDEPART, bateau.NOM AS NOMBATEAU')
+                ->where('NOLIAISON', (int)$noLiaison)
+                ->where('DATEHEUREDEPART >=', $date.' 00:00:00')
+                ->where('DATEHEUREDEPART <=', $date.' 23:59:59')
+                ->get()->getResult();
         }
         else{
             return $this->join('bateau', 'bateau.NOBATEAU = traversee.NOBATEAU')
